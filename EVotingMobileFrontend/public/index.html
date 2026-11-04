@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="fil">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1F7A33">
+<title>eBallot</title>
+<link rel="icon" type="image/png" href="Logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--forest:#1F7A33;--deep:#124A27;--leaf:#27AE60;--ink:#16251B;--mute:#5D6B61;--line:#D5E2D8;--bad:#C0392B;--f:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:#fff}
+body{margin:0;color:var(--ink);font:400 17px/1.45 var(--f);padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:#fff url(bg.webp) no-repeat left top/170% auto}
+@media(min-width:700px){body::before{background-size:cover}}
+main{max-width:480px;margin:0 auto}
+section{min-height:100dvh;display:flex;flex-direction:column;padding:20px}
+[hidden]{display:none!important}
+h1{font-size:26px;line-height:1.15;margin:0 0 6px}
+p{margin:0 0 12px}
+#home,#result,#receipt{justify-content:center}
+.logo{display:block;width:min(86%,340px);margin:0 auto 14px;filter:drop-shadow(0 0 10px #fff) drop-shadow(0 0 4px #fff)}
+.card{background:var(--forest);color:#fff;border-radius:20px;padding:26px 22px;box-shadow:0 0 36px rgba(255,255,255,.75),0 8px 24px rgba(18,74,39,.25)}
+.card p{color:#E3F3E8}
+.card.white{background:rgba(255,255,255,.96);color:var(--ink);text-align:center;box-shadow:0 8px 28px rgba(18,74,39,.22)}
+.card.white p{color:var(--mute)}
+input{width:100%;font:700 24px var(--f);letter-spacing:.06em;padding:15px 16px;border:0;border-radius:12px;background:#fff;color:var(--ink)}
+input:focus{outline:3px solid #BFF0CC}
+button{font:700 19px var(--f);border:0;border-radius:14px;padding:16px 20px;cursor:pointer;background:var(--forest);color:#fff;width:100%}
+.card:not(.white) button{background:#fff;color:var(--deep)}
+button:disabled{background:#DDE7DF!important;color:#7A887E!important;cursor:default}
+button.alt{background:#fff;color:var(--deep);border:2px solid var(--line)}
+button:focus-visible{outline:3px solid var(--deep);outline-offset:2px}
+.err{margin:12px 0}.err:not(:empty){background:#fff;color:var(--bad);font-weight:700;padding:9px 12px;border-radius:10px}
+.ic{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;font-size:40px;font-weight:700;color:#fff;background:var(--bad);margin:0 auto 10px}
+.track{width:100%;height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin:16px 0 8px}
+.track i{display:block;height:100%;background:var(--forest);animation:drain 4s linear forwards}
+@keyframes drain{from{width:100%}to{width:0}}
+@media(prefers-reduced-motion:reduce){.track i{animation:none;width:0}}
+#rc{font-style:italic;font-size:15px}
+#ballot{padding:0}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:3px solid var(--forest)}
+.top img{height:46px;flex:none}.top b{display:block;font-size:17px;color:var(--deep)}.top span{display:block;font-size:14px;line-height:1.25;color:var(--mute)}
+.grp{margin:14px 16px 0;background:rgba(255,255,255,.96);border-radius:16px;border:1px solid var(--line);overflow:hidden;box-shadow:0 4px 16px rgba(18,74,39,.1)}
+.gh{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:13px 16px;background:var(--forest);color:#fff}
+.gh b{font-size:19px;display:block}.gh small{color:#D6EEDD;font-size:15px}
+.cnt{font-weight:700;padding:2px 12px;border-radius:99px;background:#fff;color:var(--deep);white-space:nowrap}.cnt.ok{background:#7CE0A0;color:#0B3A1D}
+.cand{display:flex;align-items:center;gap:14px;text-align:left;border-radius:0;background:transparent;color:var(--ink);padding:14px 16px;border-bottom:1px solid var(--line);font-weight:400;min-height:60px}
+.cand:last-child{border-bottom:0}.cand[aria-checked=true]{background:#E4F4E9;font-weight:700}
+.bub{flex:none;width:32px;height:22px;border:2.5px solid var(--forest);border-radius:50%;background:#fff}.cand[aria-checked=true] .bub{background:var(--forest)}
+.bar{position:sticky;bottom:0;margin-top:auto;padding:12px 16px;background:rgba(255,255,255,.96);border-top:1px solid var(--line)}
+#rimg{display:block;width:100%;max-width:360px;border-radius:6px;box-shadow:0 6px 24px rgba(18,74,39,.2);margin:12px auto 8px}
+#receipt button{margin-top:10px}
+dialog{border:0;border-radius:18px;padding:20px;width:min(440px,92vw);max-height:86dvh;color:var(--ink)}
+dialog::backdrop{background:rgba(10,40,20,.6)}dialog h2{margin:0 0 10px;font-size:22px;color:var(--deep)}
+.rv{overflow:auto;max-height:46dvh}.rv b{display:block;margin-top:10px;color:var(--forest)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--deep);color:#fff;padding:10px 16px;border-radius:12px;font-size:16px;max-width:90vw;text-align:center;z-index:9}
+</style>
+</head>
+<body>
+<main>
+<section id="home">
+  <img class="logo" src="logo.webp" alt="eBallot SACDECO">
+  <div class="card">
+    <h1>Account Code</h1>
+    <p>Ilagay ang Account Code mo para i-verify kung eligible kang bumoto.</p>
+    <form id="vf" autocomplete="off">
+      <input id="code" placeholder="Account Code" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="Account Code" required>
+      <div class="err" id="herr" role="alert"></div>
+      <button id="vb">I-verify</button>
+    </form>
+  </div>
+</section>
+<section id="result" hidden><div class="card white">
+  <div class="ic" id="ric">&#10005;</div><h1 id="rt"></h1><p id="rm"></p>
+  <div class="track" id="trk"></div><p id="rc"></p>
+  <button class="alt" id="rback">Bumalik sa home</button>
+</div></section>
+<section id="ballot" hidden>
+  <div class="top"><img src="logo.webp" alt=""><div><b id="bn"></b><span id="be"></span></div></div>
+  <div id="groups"></div>
+  <div class="bar"><button id="rvb">Suriin ang boto</button></div>
+</section>
+<section id="receipt" hidden><div class="card white">
+  <h1>Naitala na ang boto mo</h1>
+  <p>I-save ang resibo sa phone bago umalis sa pahinang ito.</p>
+  <img id="rimg" alt="Resibo ng boto">
+  <p id="rcode" style="font-weight:700;color:var(--ink)"></p>
+  <button id="sv">I-save sa phone</button>
+  <p style="margin:10px 0 0;font-size:15px">Hindi lumabas ang save? Pindutin nang matagal ang larawan.</p>
+  <button class="alt" id="done">Tapos na</button>
+</div></section>
+</main>
+<dialog id="dlg"><h2>Kumpirmahin ang boto</h2><div class="rv" id="rv"></div><div class="err" id="derr"></div><div class="row"><button class="alt" id="dno">Bumalik</button><button id="dyes">Isumite</button></div></dialog>
+<div id="toast" hidden></div>
+<script>
+const $=s=>document.querySelector(s),API='/api/v1'; /* same-origin: ang Netlify Function ang kumakausap sa API */
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let S=null,timer=null;
+
+async function http(path,{method='GET',token,body}={}){
+  let r;
+  try{r=await fetch(API+path,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:body?JSON.stringify(body):undefined});}
+  catch{throw{net:true};}
+  let j=null;try{j=await r.json();}catch{}
+  if(!r.ok)throw{status:r.status,msg:(j&&(j.error||j.title))||'',detail:(j&&j.detail)||''};
+  return j;
+}
+
+function show(id){clearInterval(timer);['home','result','ballot','receipt'].forEach(s=>$('#'+s).hidden=s!==id);scrollTo(0,0);}
+function toast(t){const e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2600);}
+function home(){
+  show('home');if(S&&S.url)URL.revokeObjectURL(S.url);S=null;
+  $('#code').value='';$('#herr').textContent='';$('#vb').disabled=false;$('#vb').textContent='I-verify';
+}
+function result(title,msg){
+  show('result');$('#rt').textContent=title;$('#rm').textContent=msg;$('#trk').innerHTML='<i></i>';
+  let n=4;const tick=()=>$('#rc').textContent=`Babalik sa home sa ${n} segundo…`;tick();
+  timer=setInterval(()=>{n--;if(n<=0)home();else tick();},1000);
+}
+
+/* ---- Verify ---- */
+const DENY={
+  422:['Hindi ka maaaring bumoto','Hindi pwedeng bumoto ang account code na ito.'],
+  409:['Nakaboto ka na','Naitala na ang boto ng account code na ito sa halalang ito.'],
+  403:['Hindi kasama ang branch mo','Hindi kalahok sa halalang ito ang branch ng account code na ito.'],
+  404:['Hindi nahanap ang account code','Walang aktibong member na may ganitong account code.'],
+  429:['Sandali lang','Masyadong maraming subok. Subukan ulit maya-maya.']
+};
+$('#vf').addEventListener('submit',async ev=>{
+  ev.preventDefault();
+  const code=$('#code').value.trim();if(!code)return;
+  const b=$('#vb');b.disabled=true;b.textContent='Bine-verify…';$('#herr').textContent='';
+  try{
+    const v=await http('/auth/voter-verify',{method:'POST',body:{accountCode:code}});
+    b.textContent='Kinukuha ang balota…';
+    await openBallot(v);
+  }catch(e){
+    b.disabled=false;b.textContent='I-verify';
+    const h=t=>{$('#herr').textContent=t;};
+    if(e.net)return h('Walang koneksyon sa server. Subukan ulit.');
+    if(e.empty)return h('Wala pang kandidato sa halalang ito.');
+    if(e.status===401)return h('Hindi tinanggap ng server ang kiosk credentials.');
+    if(!e.status||e.status>=500)return h('May problema sa server. Subukan ulit.');
+    let d=DENY[e.status]||['Hindi ma-verify',e.msg||'Subukan ulit.'];
+    if(e.status===404&&/event/i.test(e.msg))d=['Walang bukas na halalan','Wala pang bukas na halalan sa ngayon.'];
+    result(d[0],d[1]+(e.status===422&&e.detail?` (${e.detail})`:''));
+  }
+});
+
+/* ---- Ballot ---- */
+const rule=g=>g.min===g.max?`Pumili ng ${g.max}`:g.min<1?`Hanggang ${g.max} ang pwedeng piliin`:`Pumili ng ${g.min} hanggang ${g.max}`;
+async function openBallot(v){
+  const id=v.event.eventId;
+  const [cs,pr]=await Promise.all([
+    http(`/events/${id}/candidates`,{token:v.accessToken}),
+    http(`/events/${id}/position-rules`)
+  ]);
+  const key=s=>String(s||'').trim().toLowerCase();
+  const groups=pr.rules.map(r=>({pos:r.position,min:r.minVotes,max:r.maxVotes,sel:new Set(),
+    cands:cs.filter(c=>key(c.position)===key(r.position)).map(c=>({id:c.candidacyId,name:c.candidateName,pos:c.position}))})).filter(g=>g.cands.length);
+  if(!groups.length)throw{empty:true};
+  S={tok:v.accessToken,member:v.member,event:v.event,groups};
+  $('#bn').textContent=v.member.name;$('#be').textContent=v.event.title;
+  $('#groups').innerHTML=groups.map((g,i)=>`<div class="grp"><div class="gh"><div><b>${esc(g.pos)}</b><small>${rule(g)}</small></div><span class="cnt" data-c="${i}"></span></div>`+
+    g.cands.map(c=>`<button class="cand" role="checkbox" aria-checked="false" data-g="${i}" data-id="${c.id}"><span class="bub"></span><span>${esc(c.name)}</span></button>`).join('')+'</div>').join('')+'<div style="height:20px"></div>';
+  paint();show('ballot');
+}
+function paint(){
+  let miss=0;
+  S.groups.forEach((g,i)=>{
+    const ok=g.sel.size>=g.min;if(!ok)miss++;
+    const c=document.querySelector(`[data-c="${i}"]`);c.textContent=`${g.sel.size}/${g.max}`;c.classList.toggle('ok',ok);
+  });
+  document.querySelectorAll('.cand').forEach(b=>b.setAttribute('aria-checked',S.groups[b.dataset.g].sel.has(+b.dataset.id)));
+  const b=$('#rvb');b.disabled=miss>0;b.textContent=miss?`Kulang pa: ${miss} posisyon`:'Suriin ang boto';
+}
+$('#groups').addEventListener('click',e=>{
+  const b=e.target.closest('.cand');if(!b)return;
+  const g=S.groups[b.dataset.g],id=+b.dataset.id;
+  if(g.sel.has(id))g.sel.delete(id);
+  else if(g.max===1){g.sel.clear();g.sel.add(id);}
+  else if(g.sel.size>=g.max)return toast(`Hanggang ${g.max} lang ang pwede sa ${g.pos}.`);
+  else g.sel.add(id);
+  paint();
+});
+
+/* ---- Review & submit ---- */
+$('#rvb').onclick=()=>{
+  $('#rv').innerHTML=S.groups.map(g=>`<b>${esc(g.pos)}</b>`+(g.cands.filter(c=>g.sel.has(c.id)).map(c=>`<div>${esc(c.name)}</div>`).join('')||'<div>—</div>')).join('');
+  $('#derr').textContent='';$('#dlg').showModal();
+};
+$('#dno').onclick=()=>$('#dlg').close();
+$('#dyes').onclick=async()=>{
+  const y=$('#dyes'),n=$('#dno');y.disabled=n.disabled=true;y.textContent='Isinusumite…';$('#derr').textContent='';
+  const selections=S.groups.flatMap(g=>g.cands.filter(c=>g.sel.has(c.id)).map(c=>({candidacyId:c.id,position:c.pos})));
+  let r;
+  try{r=await http('/votes',{method:'POST',token:S.tok,body:{eventId:S.event.eventId,selections}});}
+  catch(e){
+    y.disabled=n.disabled=false;y.textContent='Isumite';
+    if(e.net){$('#derr').textContent='Walang koneksyon. Subukan ulit.';return;}
+    if(e.status===409||e.status===401){
+      $('#dlg').close();
+      return result(e.status===409?'Naitala na ang boto mo':'Nag-expire ang session',e.status===409?'Kung wala kang resibo, lumapit sa admin.':'Mag-verify ulit gamit ang account code mo.');
+    }
+    $('#derr').textContent=(e.msg?e.msg+' '+e.detail:'Hindi naisumite. Subukan ulit.');return;
+  }
+  y.disabled=n.disabled=false;y.textContent='Isumite';$('#dlg').close();
+  await makeReceipt(r);
+};
+
+/* ---- Receipt image ---- */
+async function makeReceipt(r){
+  S.saved=false;$('#rcode').textContent='Receipt code: '+r.receiptCode;$('#sv').disabled=true;$('#rimg').removeAttribute('src');show('receipt');
+  try{
+    await document.fonts?.load?.('700 18px "Atkinson Hyperlegible"');
+    const logo=await new Promise(ok=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ok(null);i.src='logo.webp';});
+    const cv=drawReceipt(r,logo),blob=await new Promise(res=>cv.toBlob(res,'image/png'));
+    S.url=URL.createObjectURL(blob);S.file=new File([blob],`resibo-${r.receiptCode}.png`,{type:'image/png'});
+    $('#rimg').src=S.url;$('#sv').disabled=false;
+  }catch{toast('Hindi nagawa ang larawan. I-screenshot ang receipt code.');}
+}
+function drawReceipt(r,logo){
+  const W=360,K=2,P=24,INK='#16251B',MUTE='#5D6B61',F='"Atkinson Hyperlegible",system-ui,sans-serif';
+  const big=document.createElement('canvas');big.width=W*K;big.height=3600*K;
+  const x=big.getContext('2d');x.scale(K,K);x.fillStyle='#fff';x.fillRect(0,0,W,3600);x.textBaseline='top';
+  let y=0;
+  const font=(w,s,c)=>{x.font=`${w} ${s}px ${F}`;x.fillStyle=c;};
+  const wrap=(t,w)=>{const o=[];let l='';for(const s of String(t).split(/\s+/)){const n=l?l+' '+s:s;if(x.measureText(n).width>w&&l){o.push(l);l=s;}else l=n;}o.push(l);return o;};
+  const T=(t,wt,sz,col,ind=0,al='left')=>{font(wt,sz,col);x.textAlign=al;for(const l of wrap(t,W-2*P-ind)){x.fillText(l,al==='center'?W/2:P+ind,y);y+=Math.round(sz*1.35);}};
+  const dash=()=>{y+=8;x.strokeStyle='#BFD3C4';x.lineWidth=1.2;x.setLineDash([5,4]);x.beginPath();x.moveTo(P,y);x.lineTo(W-P,y);x.stroke();x.setLineDash([]);y+=14;};
+  const lw=190,lh=logo?Math.round(lw*logo.height/logo.width):0;if(logo)x.drawImage(logo,(W-lw)/2,14,lw,lh);
+  const by=lh+22;x.fillStyle='#1F7A33';x.fillRect(0,by,W,44);font(700,20,'#fff');x.textAlign='center';x.fillText('Resibo ng Boto',W/2,by+12);y=by+66;
+  T(S.event.title,700,18,INK,0,'center');
+  T(new Date(r.votedAt).toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Manila'}),400,14,MUTE,0,'center');
+  dash();
+  T('Member',400,13,MUTE);T(S.member.name,700,18,INK);T('Account Code: '+S.member.accountCode,400,14,MUTE);
+  dash();
+  for(const g of S.groups){
+    T(g.pos,700,15,'#1F7A33');
+    for(const c of g.cands.filter(c=>g.sel.has(c.id))){x.fillStyle=INK;x.beginPath();x.ellipse(P+10,y+11,9,6,0,0,7);x.fill();T(c.name,400,17,INK,28);}
+    y+=8;
+  }
+  dash();
+  T('Receipt code',400,13,MUTE,0,'center');T(r.receiptCode,700,26,INK,0,'center');y+=4;
+  T('Itago ang resibong ito bilang patunay na naitala ang boto mo.',400,12,MUTE,0,'center');y+=P;
+  const H=Math.ceil(y),out=document.createElement('canvas');out.width=W*K;out.height=H*K;
+  out.getContext('2d').drawImage(big,0,0,W*K,H*K,0,0,W*K,H*K);return out;
+}
+$('#sv').onclick=async()=>{
+  try{
+    if(navigator.canShare?.({files:[S.file]}))await navigator.share({files:[S.file],title:'Resibo ng Boto'});
+    else{const a=Object.assign(document.createElement('a'),{href:S.url,download:S.file.name});document.body.append(a);a.click();a.remove();}
+    S.saved=true;
+  }catch(e){if(e.name!=='AbortError')toast('Hindi na-save. Pindutin nang matagal ang larawan.');}
+};
+$('#done').onclick=()=>{if(!S.saved&&!confirm('Hindi mo pa nase-save ang resibo. Aalis pa rin?'))return;home();};
+$('#rback').onclick=home;
+</script>
+</body>
+</html>

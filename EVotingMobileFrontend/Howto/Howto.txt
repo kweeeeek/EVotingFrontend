@@ -1,0 +1,10 @@
+npm i -g netlify-cli
+cd "C:\Users\DELL\Pictures\EvotingSystemProduction==09-20-2026\EVotingProject\EVotingMobileFrontend"
+netlify deploy                
+netlify env:set KIOSK_SECRET <value ng EVOTING_KIOSK_SECRET>
+netlify deploy --prod
+
+
+kung gusto mo naman itest ang latency gamit ang k6 
+cd C:\Users\DELL\Pictures\EvotingSystemProduction==09-20-2026\EVotingProject\EVoting.Api\Testing
+k6 run latencytesting.js
