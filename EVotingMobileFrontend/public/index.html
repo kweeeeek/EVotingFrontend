@@ -8,57 +8,75 @@
 <link rel="icon" type="image/png" href="Logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--forest:#1F7A33;--deep:#124A27;--leaf:#27AE60;--ink:#16251B;--mute:#5D6B61;--line:#D5E2D8;--bad:#C0392B;--f:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+:root{--forest:#1F7A33;--deep:#124A27;--leaf:#27AE60;--tint:#EEF7F0;--ink:#16251B;--mute:#66756B;--line:#E1EAE3;--bad:#C0392B;--r:14px;--f:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:#fff}
-body{margin:0;color:var(--ink);font:400 17px/1.45 var(--f);padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+body{margin:0;color:var(--ink);font:400 14px/1.5 var(--f);-webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 body::before{content:"";position:fixed;inset:0;z-index:-1;background:#fff url(bg.webp) no-repeat left top/170% auto}
 @media(min-width:700px){body::before{background-size:cover}}
-main{max-width:480px;margin:0 auto}
-section{min-height:100dvh;display:flex;flex-direction:column;padding:20px}
+main{max-width:440px;margin:0 auto}
+section{min-height:100dvh;display:flex;flex-direction:column;padding:20px 16px}
 [hidden]{display:none!important}
-h1{font-size:26px;line-height:1.15;margin:0 0 6px}
+h1{font-size:18px;line-height:1.25;font-weight:700;letter-spacing:-.01em;margin:0 0 6px}
 p{margin:0 0 12px}
-#home,#result,#receipt{justify-content:center}
-.logo{display:block;width:min(86%,340px);margin:0 auto 14px;filter:drop-shadow(0 0 10px #fff) drop-shadow(0 0 4px #fff)}
-.card{background:var(--forest);color:#fff;border-radius:20px;padding:26px 22px;box-shadow:0 0 36px rgba(255,255,255,.75),0 8px 24px rgba(18,74,39,.25)}
-.card p{color:#E3F3E8}
-.card.white{background:rgba(255,255,255,.96);color:var(--ink);text-align:center;box-shadow:0 8px 28px rgba(18,74,39,.22)}
-.card.white p{color:var(--mute)}
-input{width:100%;font:700 24px var(--f);letter-spacing:.06em;padding:15px 16px;border:0;border-radius:12px;background:#fff;color:var(--ink)}
-input:focus{outline:3px solid #BFF0CC}
-button{font:700 19px var(--f);border:0;border-radius:14px;padding:16px 20px;cursor:pointer;background:var(--forest);color:#fff;width:100%}
-.card:not(.white) button{background:#fff;color:var(--deep)}
-button:disabled{background:#DDE7DF!important;color:#7A887E!important;cursor:default}
-button.alt{background:#fff;color:var(--deep);border:2px solid var(--line)}
-button:focus-visible{outline:3px solid var(--deep);outline-offset:2px}
-.err{margin:12px 0}.err:not(:empty){background:#fff;color:var(--bad);font-weight:700;padding:9px 12px;border-radius:10px}
-.ic{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;font-size:40px;font-weight:700;color:#fff;background:var(--bad);margin:0 auto 10px}
-.track{width:100%;height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin:16px 0 8px}
+#home,#result,#receipt,#guide{justify-content:center}
+.logo{display:block;width:min(70%,250px);margin:0 auto 16px;filter:drop-shadow(0 0 10px #fff) drop-shadow(0 0 4px #fff)}
+.card{background:rgba(255,255,255,.97);color:var(--ink);border-radius:20px;padding:24px 20px;border:1px solid var(--line);box-shadow:0 1px 2px rgba(18,74,39,.06),0 12px 32px rgba(18,74,39,.14)}
+.card p{color:var(--mute);font-size:14px}
+.card.white{text-align:center}
+.lbl{display:block;font-size:13px;font-weight:600;color:var(--ink);margin:14px 0 6px}
+input[type=text],input:not([type]){width:100%;font:500 15px var(--f);letter-spacing:.02em;padding:9px 12px;border:1px solid #CBD8CF;border-radius:10px;background:#F8FBF9;color:var(--ink);transition:border-color .15s,box-shadow .15s,background .15s}
+input::placeholder{color:#9AA8A0;font-weight:400;letter-spacing:0}
+input:focus{outline:0;border-color:var(--forest);background:#fff;box-shadow:none}
+button{font:600 14px var(--f);border:0;border-radius:10px;padding:10px 16px;cursor:pointer;background:var(--forest);color:#fff;width:100%;transition:background .15s,transform .05s}
+button:hover:not(:disabled){background:var(--deep)}button:active:not(:disabled){transform:scale(.98)}
+button:disabled{background:#E3EAE5!important;color:#8A988F!important;cursor:default}
+button.alt{background:#fff;color:var(--deep);border:1px solid #CBD8CF}
+button.alt:hover:not(:disabled){background:var(--tint)}
+button:focus-visible{outline:2px solid rgba(31,122,51,.45);outline-offset:2px}input:focus-visible{outline:0}
+.err{margin:10px 0 0}.err:not(:empty){background:#FDECEA;color:var(--bad);font-size:13px;font-weight:500;padding:9px 12px;border-radius:10px;margin-bottom:12px}
+#vf button{margin-top:12px}
+.ic{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font-size:28px;font-weight:700;color:#fff;background:var(--bad);margin:0 auto 12px}
+.track{width:100%;height:5px;background:var(--line);border-radius:9px;overflow:hidden;margin:16px 0 8px}
 .track i{display:block;height:100%;background:var(--forest);animation:drain 4s linear forwards}
 @keyframes drain{from{width:100%}to{width:0}}
 @media(prefers-reduced-motion:reduce){.track i{animation:none;width:0}}
-#rc{font-style:italic;font-size:15px}
+#rc{font-style:normal;font-size:13px}
+#result button{margin-top:6px}
+/* Instructions */
+.who{display:flex;align-items:center;gap:10px;background:var(--tint);border-radius:12px;padding:10px 12px;margin:12px 0 4px}
+.who i{flex:none;width:34px;height:34px;border-radius:50%;background:var(--forest);color:#fff;display:grid;place-items:center;font:700 14px var(--f);font-style:normal}
+.who b{display:block;font-size:14px}.who span{display:block;font-size:12px;color:var(--mute);line-height:1.3}
+.steps{list-style:none;margin:12px 0;padding:0;max-height:44dvh;overflow:auto;text-align:left;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding:0 0 12px 36px;font-size:14px;line-height:1.45}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--tint);color:var(--deep);font:700 12px/24px var(--f);text-align:center}
+.steps b{display:block;font-size:14px}.steps span{color:var(--mute);font-size:13px}
+.ack{display:flex;gap:10px;align-items:flex-start;text-align:left;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:13px;cursor:pointer;margin-bottom:12px;background:#fff}
+.ack input{flex:none;width:18px;height:18px;margin:1px 0 0;accent-color:var(--forest)}
+#gb{margin-top:8px}
+/* Ballot */
 #ballot{padding:0}
-.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:3px solid var(--forest)}
-.top img{height:46px;flex:none}.top b{display:block;font-size:17px;color:var(--deep)}.top span{display:block;font-size:14px;line-height:1.25;color:var(--mute)}
-.grp{margin:14px 16px 0;background:rgba(255,255,255,.96);border-radius:16px;border:1px solid var(--line);overflow:hidden;box-shadow:0 4px 16px rgba(18,74,39,.1)}
-.gh{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:13px 16px;background:var(--forest);color:#fff}
-.gh b{font-size:19px;display:block}.gh small{color:#D6EEDD;font-size:15px}
-.cnt{font-weight:700;padding:2px 12px;border-radius:99px;background:#fff;color:var(--deep);white-space:nowrap}.cnt.ok{background:#7CE0A0;color:#0B3A1D}
-.cand{display:flex;align-items:center;gap:14px;text-align:left;border-radius:0;background:transparent;color:var(--ink);padding:14px 16px;border-bottom:1px solid var(--line);font-weight:400;min-height:60px}
-.cand:last-child{border-bottom:0}.cand[aria-checked=true]{background:#E4F4E9;font-weight:700}
-.bub{flex:none;width:32px;height:22px;border:2.5px solid var(--forest);border-radius:50%;background:#fff}.cand[aria-checked=true] .bub{background:var(--forest)}
-.bar{position:sticky;bottom:0;margin-top:auto;padding:12px 16px;background:rgba(255,255,255,.96);border-top:1px solid var(--line)}
-#rimg{display:block;width:100%;max-width:360px;border-radius:6px;box-shadow:0 6px 24px rgba(18,74,39,.2);margin:12px auto 8px}
-#receipt button{margin-top:10px}
-dialog{border:0;border-radius:18px;padding:20px;width:min(440px,92vw);max-height:86dvh;color:var(--ink)}
-dialog::backdrop{background:rgba(10,40,20,.6)}dialog h2{margin:0 0 10px;font-size:22px;color:var(--deep)}
-.rv{overflow:auto;max-height:46dvh}.rv b{display:block;margin-top:10px;color:var(--forest)}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-#toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--deep);color:#fff;padding:10px 16px;border-radius:12px;font-size:16px;max-width:90vw;text-align:center;z-index:9}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:8px 14px;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top img{height:34px;flex:none}.top b{display:block;font-size:14px;color:var(--deep)}.top span{display:block;font-size:12px;line-height:1.25;color:var(--mute)}
+.grp{margin:12px 14px 0;background:rgba(255,255,255,.97);border-radius:16px;border:1px solid var(--line);overflow:hidden;box-shadow:0 2px 10px rgba(18,74,39,.08)}
+.gh{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 14px;background:var(--tint);border-bottom:1px solid var(--line)}
+.gh b{font-size:14px;display:block;color:var(--deep)}.gh small{color:var(--mute);font-size:12px}
+.cnt{font-weight:600;font-size:12px;padding:3px 10px;border-radius:99px;background:#fff;border:1px solid var(--line);color:var(--deep);white-space:nowrap}.cnt.ok{background:var(--forest);border-color:var(--forest);color:#fff}
+.cand{display:flex;align-items:center;gap:12px;text-align:left;border-radius:0;background:transparent;color:var(--ink);padding:9px 14px;border-bottom:1px solid var(--line);font-weight:400;font-size:14px;min-height:44px}
+.cand:hover:not(:disabled){background:#F6FAF7}
+.cand:last-child{border-bottom:0}.cand[aria-checked=true],.cand[aria-checked=true]:hover{background:var(--tint);font-weight:600}
+.bub{flex:none;width:22px;height:22px;border:2px solid #B9CBBF;border-radius:50%;background:#fff;display:grid;place-items:center;transition:all .15s}
+.cand[aria-checked=true] .bub{background:var(--forest);border-color:var(--forest);box-shadow:inset 0 0 0 4px #fff}
+.bar{position:sticky;bottom:0;margin-top:auto;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line)}
+#rimg{display:block;width:100%;max-width:320px;border-radius:8px;border:1px solid var(--line);box-shadow:0 6px 20px rgba(18,74,39,.15);margin:12px auto 10px}
+#receipt button{margin-top:8px}
+dialog{border:0;border-radius:20px;padding:20px;width:min(400px,92vw);max-height:86dvh;color:var(--ink);box-shadow:0 20px 50px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(10,40,20,.55);backdrop-filter:blur(2px)}dialog h2{margin:0 0 10px;font-size:18px;color:var(--deep)}
+.rv{overflow:auto;max-height:46dvh;font-size:14px}.rv b{display:block;margin-top:10px;color:var(--forest);font-size:13px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--deep);color:#fff;padding:9px 14px;border-radius:12px;font-size:13px;max-width:90vw;text-align:center;z-index:9;box-shadow:0 6px 20px rgba(0,0,0,.2)}
 </style>
 </head>
 <body>
@@ -69,16 +87,33 @@ dialog::backdrop{background:rgba(10,40,20,.6)}dialog h2{margin:0 0 10px;font-siz
     <h1>Account Code</h1>
     <p>Ilagay ang Account Code mo para i-verify kung eligible kang bumoto.</p>
     <form id="vf" autocomplete="off">
-      <input id="code" placeholder="Account Code" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="Account Code" required>
+      <label class="lbl" for="code">Account Code</label>
+      <input id="code" placeholder="Ilagay dito" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="Account Code" required>
       <div class="err" id="herr" role="alert"></div>
       <button id="vb">I-verify</button>
     </form>
   </div>
-</section>
+  </section>
 <section id="result" hidden><div class="card white">
   <div class="ic" id="ric">&#10005;</div><h1 id="rt"></h1><p id="rm"></p>
   <div class="track" id="trk"></div><p id="rc"></p>
   <button class="alt" id="rback">Bumalik sa home</button>
+</div></section>
+<section id="guide" hidden><div class="card white">
+  <h1>Bago ka bumoto</h1>
+  <p>Basahin muna ang mga tagubilin sa ibaba.</p>
+  <div class="who"><i id="gi">?</i><div style="text-align:left"><b id="gn"></b><span id="ge"></span></div></div>
+  <ol class="steps" id="gs">
+    <li><b>Pumili sa bawat posisyon</b><span>Nakasulat sa itaas ng bawat posisyon kung ilan ang pwede mong piliin (hal. &ldquo;Pumili ng 3&rdquo;).</span></li>
+    <li><b>Pindutin ang pangalan ng kandidato</b><span>Para piliin siya. Pindutin ulit para alisin ang pili.</span></li>
+    <li><b>Tingnan ang bilang sa kanan</b><span>Ipinapakita rito kung ilan na ang napili mo (hal. 2/3). Magiging berde ito kapag sapat na ang pili mo.</span></li>
+    <li><b>Suriin ang boto</b><span>Kapag kumpleto na ang lahat ng posisyon, pindutin ang &ldquo;Suriin ang boto&rdquo; para makita ang buod ng mga napili mo.</span></li>
+    <li><b>Isumite ang boto</b><span>Pindutin ang &ldquo;Isumite&rdquo; kung sigurado ka na. Hindi na mababago ang boto pagkatapos isumite.</span></li>
+    <li><b>I-save ang resibo</b><span>Pagkatapos magsumite, i-save ang resibo sa phone mo bago umalis sa pahina.</span></li>
+  </ol>
+  <label class="ack"><input type="checkbox" id="gck"><span>Nabasa at naintindihan ko ang mga tagubilin.</span></label>
+  <button id="gb" disabled>Magpatuloy sa balota</button>
+  <button class="alt" id="gback" style="margin-top:8px">Bumalik</button>
 </div></section>
 <section id="ballot" hidden>
   <div class="top"><img src="logo.webp" alt=""><div><b id="bn"></b><span id="be"></span></div></div>
@@ -111,7 +146,7 @@ async function http(path,{method='GET',token,body}={}){
   return j;
 }
 
-function show(id){clearInterval(timer);['home','result','ballot','receipt'].forEach(s=>$('#'+s).hidden=s!==id);scrollTo(0,0);}
+function show(id){clearInterval(timer);['home','result','guide','ballot','receipt'].forEach(s=>$('#'+s).hidden=s!==id);scrollTo(0,0);}
 function toast(t){const e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2600);}
 function home(){
   show('home');if(S&&S.url)URL.revokeObjectURL(S.url);S=null;
@@ -152,6 +187,16 @@ $('#vf').addEventListener('submit',async ev=>{
   }
 });
 
+/* ---- Instructions (bago ang balota) ---- */
+function showGuide(){
+  $('#gn').textContent=S.member.name;$('#ge').textContent=S.event.title;
+  $('#gi').textContent=(S.member.name||'?').trim().charAt(0).toUpperCase();
+  $('#gck').checked=false;$('#gb').disabled=true;$('#gs').scrollTop=0;show('guide');
+}
+$('#gck').onchange=e=>$('#gb').disabled=!e.target.checked;
+$('#gb').onclick=()=>{if($('#gck').checked)show('ballot');};
+$('#gback').onclick=home;
+
 /* ---- Ballot ---- */
 const rule=g=>g.min===g.max?`Pumili ng ${g.max}`:g.min<1?`Hanggang ${g.max} ang pwedeng piliin`:`Pumili ng ${g.min} hanggang ${g.max}`;
 async function openBallot(v){
@@ -168,7 +213,7 @@ async function openBallot(v){
   $('#bn').textContent=v.member.name;$('#be').textContent=v.event.title;
   $('#groups').innerHTML=groups.map((g,i)=>`<div class="grp"><div class="gh"><div><b>${esc(g.pos)}</b><small>${rule(g)}</small></div><span class="cnt" data-c="${i}"></span></div>`+
     g.cands.map(c=>`<button class="cand" role="checkbox" aria-checked="false" data-g="${i}" data-id="${c.id}"><span class="bub"></span><span>${esc(c.name)}</span></button>`).join('')+'</div>').join('')+'<div style="height:20px"></div>';
-  paint();show('ballot');
+  paint();showGuide();
 }
 function paint(){
   let miss=0;
@@ -217,7 +262,7 @@ $('#dyes').onclick=async()=>{
 async function makeReceipt(r){
   S.saved=false;$('#rcode').textContent='Receipt code: '+r.receiptCode;$('#sv').disabled=true;$('#rimg').removeAttribute('src');show('receipt');
   try{
-    await document.fonts?.load?.('700 18px "Atkinson Hyperlegible"');
+    await document.fonts?.load?.('700 18px "Inter"');await document.fonts?.load?.('400 14px "Inter"');
     const logo=await new Promise(ok=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ok(null);i.src='logo.webp';});
     const cv=drawReceipt(r,logo),blob=await new Promise(res=>cv.toBlob(res,'image/png'));
     S.url=URL.createObjectURL(blob);S.file=new File([blob],`resibo-${r.receiptCode}.png`,{type:'image/png'});
@@ -225,7 +270,7 @@ async function makeReceipt(r){
   }catch{toast('Hindi nagawa ang larawan. I-screenshot ang receipt code.');}
 }
 function drawReceipt(r,logo){
-  const W=360,K=2,P=24,INK='#16251B',MUTE='#5D6B61',F='"Atkinson Hyperlegible",system-ui,sans-serif';
+  const W=360,K=2,P=24,INK='#16251B',MUTE='#5D6B61',F='"Inter",system-ui,sans-serif';
   const big=document.createElement('canvas');big.width=W*K;big.height=3600*K;
   const x=big.getContext('2d');x.scale(K,K);x.fillStyle='#fff';x.fillRect(0,0,W,3600);x.textBaseline='top';
   let y=0;
