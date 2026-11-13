@@ -38,6 +38,8 @@ button.alt:hover:not(:disabled){background:var(--tint)}
 button:focus-visible{outline:2px solid rgba(31,122,51,.45);outline-offset:2px}input:focus-visible{outline:0}
 .err{margin:10px 0 0}.err:not(:empty){background:#FDECEA;color:var(--bad);font-size:13px;font-weight:500;padding:9px 12px;border-radius:10px;margin-bottom:12px}
 #vf button{margin-top:12px}
+#vf button.alt{margin-top:8px}
+.qri{width:18px;height:18px;fill:currentColor;vertical-align:-4px;margin-right:8px}
 .ic{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font-size:28px;font-weight:700;color:#fff;background:var(--bad);margin:0 auto 12px}
 .track{width:100%;height:5px;background:var(--line);border-radius:9px;overflow:hidden;margin:16px 0 8px}
 .track i{display:block;height:100%;background:var(--forest);animation:drain 4s linear forwards}
@@ -76,6 +78,17 @@ dialog{border:0;border-radius:20px;padding:20px;width:min(400px,92vw);max-height
 dialog::backdrop{background:rgba(10,40,20,.55);backdrop-filter:blur(2px)}dialog h2{margin:0 0 10px;font-size:18px;color:var(--deep)}
 .rv{overflow:auto;max-height:46dvh;font-size:14px}.rv b{display:block;margin-top:10px;color:var(--forest);font-size:13px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+/* QR scanner (scan.js) */
+#scn{padding:16px}
+.vid{position:relative;aspect-ratio:1/1;background:#0B1E12;border-radius:14px;overflow:hidden}
+.vid video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vid .frame{position:absolute;inset:16%;border:3px solid rgba(255,255,255,.92);border-radius:16px;box-shadow:0 0 0 999px rgba(10,40,20,.38)}
+.vid[data-on=false]{display:none}
+#scm{margin:10px 0 0;font-size:13px;color:var(--mute)}
+#scn .err:not(:empty){margin-top:10px;margin-bottom:0}
+#scp{margin-top:12px}
+#scx{margin-top:8px}
+@media(max-width:300px){dialog{padding:16px}.row{grid-template-columns:1fr}}
 #toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--deep);color:#fff;padding:9px 14px;border-radius:12px;font-size:13px;max-width:90vw;text-align:center;z-index:9;box-shadow:0 6px 20px rgba(0,0,0,.2)}
 </style>
 </head>
@@ -91,6 +104,7 @@ dialog::backdrop{background:rgba(10,40,20,.55);backdrop-filter:blur(2px)}dialog 
       <input id="code" placeholder="00xxxxxxxxxx" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="00xxxxxxxxxx" required>
       <div class="err" id="herr" role="alert"></div>
       <button id="vb">I-verify</button>
+      <button class="alt" id="scanb" type="button"><svg class="qri" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 3h7v7H3zm2 2v3h3V5zM14 3h7v7h-7zm2 2v3h3V5zM3 14h7v7H3zm2 2v3h3v-3zM14 14h3v3h-3zm4 0h3v3h-3zm-4 4h3v3h-3zm4 3v-3h3v3z"/></svg>I-scan ang QR code</button>
     </form>
   </div>
   </section>
@@ -131,7 +145,17 @@ dialog::backdrop{background:rgba(10,40,20,.55);backdrop-filter:blur(2px)}dialog 
 </div></section>
 </main>
 <dialog id="dlg"><h2>Kumpirmahin ang boto</h2><div class="rv" id="rv"></div><div class="err" id="derr"></div><div class="row"><button class="alt" id="dno">Bumalik</button><button id="dyes">Isumite</button></div></dialog>
+<dialog id="scn" aria-labelledby="scnt">
+  <h2 id="scnt">I-scan ang QR code</h2>
+  <div class="vid" id="scs"><video id="scv" playsinline muted></video><i class="frame"></i></div>
+  <p id="scm">Itapat ang QR code sa loob ng kahon. Kusa itong mababasa.</p>
+  <div class="err" id="sce" role="alert"></div>
+  <input type="file" id="scf" accept="image/*" capture="environment" hidden>
+  <button class="alt" id="scp" type="button">Kunan ng litrato ang QR</button>
+  <button class="alt" id="scx" type="button">Kanselahin</button>
+</dialog>
 <div id="toast" hidden></div>
+<script src="scan.js"></script>
 <script>
 const $=s=>document.querySelector(s),API='/api/v1'; /* same-origin: ang Netlify Function ang kumakausap sa API */
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -150,7 +174,8 @@ function show(id){clearInterval(timer);['home','result','guide','ballot','receip
 function toast(t){const e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2600);}
 function home(){
   show('home');if(S&&S.url)URL.revokeObjectURL(S.url);S=null;
-  $('#code').value='';$('#herr').textContent='';$('#vb').disabled=false;$('#vb').textContent='I-verify';
+  if(window.QrScan)QrScan.close();
+  $('#code').value='';$('#herr').textContent='';$('#vb').disabled=false;$('#scanb').disabled=false;$('#vb').textContent='I-verify';
 }
 function result(title,msg){
   show('result');$('#rt').textContent=title;$('#rm').textContent=msg;$('#trk').innerHTML='<i></i>';
@@ -169,13 +194,13 @@ const DENY={
 $('#vf').addEventListener('submit',async ev=>{
   ev.preventDefault();
   const code=$('#code').value.trim();if(!code)return;
-  const b=$('#vb');b.disabled=true;b.textContent='Bine-verify…';$('#herr').textContent='';
+  const b=$('#vb');b.disabled=true;$('#scanb').disabled=true;b.textContent='Bine-verify…';$('#herr').textContent='';
   try{
     const v=await http('/auth/voter-verify',{method:'POST',body:{accountCode:code}});
     b.textContent='Kinukuha ang balota…';
     await openBallot(v);
   }catch(e){
-    b.disabled=false;b.textContent='I-verify';
+    b.disabled=false;$('#scanb').disabled=false;b.textContent='I-verify';
     const h=t=>{$('#herr').textContent=t;};
     if(e.net)return h('Walang koneksyon sa server. Subukan ulit.');
     if(e.empty)return h('Wala pang kandidato sa halalang ito.');
@@ -186,6 +211,13 @@ $('#vf').addEventListener('submit',async ev=>{
     result(d[0],d[1]+(e.status===422&&e.detail?` (${e.detail})`:''));
   }
 });
+
+/* ---- I-scan ang QR code: ang QR ng Registration ay Account Code lang; kusa itong isinusulat at vine-verify na parang tinype (scan.js) ---- */
+$('#scanb').onclick=()=>{
+  if(!window.QrScan)return;
+  $('#herr').textContent='';
+  QrScan.open({onCode:c=>{$('#code').value=c;const f=$('#vf');if(f.requestSubmit)f.requestSubmit();else f.dispatchEvent(new Event('submit',{cancelable:true,bubbles:true}));}});
+};
 
 /* ---- Instructions (bago ang balota) ---- */
 function showGuide(){
