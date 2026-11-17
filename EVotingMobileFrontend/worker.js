@@ -22,7 +22,12 @@ async function kiosk(e,f){
   return kTok
 }
 
-const out=(t,s,g)=>new Response(t,{status:s,headers:{'Content-Type':'application/json','Cache-Control':'no-store',...(g?{'X-Cache':g}:{})}});
+// Security headers on every answer. camera=(self) because the page reads the Registration QR with the phone's camera.
+const SEC={'X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'no-referrer',
+  'Permissions-Policy':'camera=(self), microphone=(), geolocation=(), payment=()','Cross-Origin-Opener-Policy':'same-origin'};
+const out=(t,s,g)=>new Response(t,{status:s,headers:{'Content-Type':'application/json','Cache-Control':'no-store',...SEC,...(g?{'X-Cache':g}:{})}});
+// A server error is never relayed as-is: its body can carry internal details. The page only needs to know it should retry.
+const upstreamFailed=()=>err('The server had a problem. Please try again.',502);
 const err=(m,s,d)=>out(JSON.stringify({error:m,detail:d}),s);
 
 async function handleApi(r,e){
@@ -59,11 +64,12 @@ async function handleApi(r,e){
       cache.set(p,{t:Date.now(),body:text});
       return out(text,200,'MISS')
     }
-    if(res.status>=500) return stale()||out(await res.text(),res.status);
+    if(res.status>=500) return stale()||(res.status===503?err('The server is busy. Please try again.',503):upstreamFailed());
     return out(await res.text(),res.status)
   } catch(e2){
-    const why=e2.message||e2+(e2.cause?.code?' '+e2.cause.code:'');
-    return stale()||(e2.creds?err('Kiosk credentials rejected.',401):err('API unreachable.',502,why))
+    // The reason (host names, socket errors) goes to the Worker log only, never to the browser.
+    console.error('proxy', r.method, p, e2.message||String(e2), e2.cause?.code||'');
+    return stale()||(e2.creds?err('Kiosk credentials rejected.',401):err('API unreachable.',502))
   }
 }
 
@@ -75,27 +81,15 @@ async function proxyAssets(request, env){
   assetUrl.search=url.search;
   const r=await env.ASSETS.fetch(new Request(assetUrl, request));
   const headers=new Headers(r.headers);
-  headers.set('Cache-Control','public, max-age=3600');
+  headers.set('Cache-Control', path==='/'||path.endsWith('.html') ? 'no-cache' : 'public, max-age=3600');
+  for(const [k,v] of Object.entries(SEC)) headers.set(k,v);
   return new Response(r.body, {status:r.status, headers});
-}
-
-async function debugProxy(request, env){
-  const url=new URL(request.url);
-  const results={};
-  for(const p of ['/','/index.html','/logo.webp','/bg.webp']){
-    try{
-      const r=await env.ASSETS.fetch(new Request(new URL(p, url.origin)));
-      results[p]={status:r.status, type:r.headers.get('content-type'), len:r.headers.get('content-length')};
-    }catch(e){results[p]={error:e.message};}
-  }
-  return new Response(JSON.stringify(results,null,2),{headers:{'Content-Type':'application/json'}});
 }
 
 export default{
   async fetch(request, env){
     const url=new URL(request.url);
     if(url.pathname.startsWith('/api/v1')) return handleApi(request, env);
-    if(url.pathname==='/__debug') return debugProxy(request, env);
     return proxyAssets(request, env);
   }
 };
