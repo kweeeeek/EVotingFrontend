@@ -30,6 +30,33 @@ const out=(t,s,g)=>new Response(t,{status:s,headers:{'Content-Type':'application
 const upstreamFailed=()=>err('The server had a problem. Please try again.',502);
 const err=(m,s,d)=>out(JSON.stringify({error:m,detail:d}),s);
 
+// This page votes in General Assembly elections only. A Representative election that is open now gets one clear answer
+// BEFORE the member is looked up: otherwise a member who already voted in it was told "you already voted" here, and one
+// who had not would have been shown the Representative ballot.
+const WRONG_TYPE=()=>out(JSON.stringify({error:'The election that is open now is a Representative election. Please use the Representative voting page.',
+  code:'WRONG_EVENT_TYPE',eventType:'REPRESENTATIVE'}),409);
+// The open election's type, kept 15 s per Worker instance (the API caches events/current too): a burst of voters is one call.
+// 'NONE' = nothing open; null = unknown (the check after voter-verify still applies).
+let oType=null, oAt=0, oFly=null;
+async function openType(e,B){
+  if(oAt && Date.now()-oAt<15e3) return oType;
+  if(oFly) return oFly;                       // voters arriving together share one question
+  const p=askOpenType(e,B); oFly=p;
+  try{ return await p } finally { if(oFly===p) oFly=null }
+}
+async function askOpenType(e,B){
+  const ask=async t=>fetch(B+'/events/current',{headers:{Authorization:'Bearer '+t}});
+  try{
+    let res=await ask(await kiosk(e,false));
+    if(res.status===401) res=await ask(await kiosk(e,true));
+    let v=null;
+    if(res.status===404) v='NONE';
+    else if(res.ok){ const j=await res.json().catch(()=>null); v=j&&typeof j.eventType==='string'?j.eventType:null; }
+    if(v){ oType=v; oAt=Date.now(); }
+    return v
+  }catch{ return null }
+}
+
 async function handleApi(r,e){
   const B=getBase(e),
   TTL=Number(e.CACHE_SECONDS??TTL_DEFAULT)*1e3,
@@ -55,8 +82,16 @@ async function handleApi(r,e){
   const call=t=>fetch(B+p,{method:r.method, body:body?JSON.stringify(body):undefined, headers:{'Content-Type':'application/json', ...(t?{Authorization:'Bearer '+t}:{})}});
 
   try{
+    if(p==='/auth/voter-verify' && await openType(e,B)==='REPRESENTATIVE') return WRONG_TYPE();
     let res=await call(uk ? await kiosk(e,false) : vt);
     if(uk && res.status===401) res=await call(await kiosk(e,true));
+    if(p==='/auth/voter-verify' && res.ok){
+      // Second check on the answer itself: the type above may be up to 15 s old.
+      const text=await res.text();
+      let j=null; try{ j=JSON.parse(text) }catch{}
+      if(j && j.event && j.event.eventType==='REPRESENTATIVE') return WRONG_TYPE();
+      return out(text,200)
+    }
     if(get && res.ok){
       let text=await res.text();
       if(p.endsWith('/candidates')) text=JSON.stringify(JSON.parse(text).map(({photoBase64,...c})=>c));

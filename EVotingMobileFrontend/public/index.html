@@ -166,7 +166,7 @@ async function http(path,{method='GET',token,body}={}){
   try{r=await fetch(API+path,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:body?JSON.stringify(body):undefined});}
   catch{throw{net:true};}
   let j=null;try{j=await r.json();}catch{}
-  if(!r.ok)throw{status:r.status,msg:(j&&(j.error||j.title))||'',detail:(j&&j.detail)||''};
+  if(!r.ok)throw{status:r.status,code:(j&&j.code)||'',msg:(j&&(j.error||j.title))||'',detail:(j&&j.detail)||''};
   return j;
 }
 
@@ -207,6 +207,7 @@ $('#vf').addEventListener('submit',async ev=>{
     if(e.status===401)return h('Hindi tinanggap ng server ang kiosk credentials.');
     if(!e.status||e.status>=500)return h('May problema sa server. Subukan ulit.');
     let d=DENY[e.status]||['Hindi ma-verify',e.msg||'Subukan ulit.'];
+    if(e.code==='WRONG_EVENT_TYPE')d=['Para sa Representative Assembly ang halalan','Ang kasalukuyang halalan ay para lang sa Representative Assembly at hindi para sa GA. Mangyaring gamitin ang app para sa Representative.'];
     if(e.status===404&&/event/i.test(e.msg))d=['Walang bukas na halalan','Wala pang bukas na halalan sa ngayon.'];
     result(d[0],d[1]+(e.status===422&&e.detail?` (${e.detail})`:''));
   }
